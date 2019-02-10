@@ -60,7 +60,7 @@ app.get('/info', (request, response ) => {
         )
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/people/:id', (request, response) => {
     const id = Number(request.params.id)
     const person = people.find(person => person.id === id)
     if (person) {
@@ -69,7 +69,7 @@ app.get('/api/persons/:id', (request, response) => {
         response.status(404).end()
     }
 })
-app.post('/api/persons', (request, response) => {
+app.post('/api/people', (request, response) => {
     const body = request.body
     if (body.name === undefined || body.number === undefined){
         return response.status(400).json({
@@ -103,7 +103,7 @@ app.delete('/api/persons/:id', (request, response) => {
 app.get('/', (request, response) => {
     response.send('Hello World!')
 })
-app.get('/api/persons', (request, response) => {
+app.get('/api/people', (request, response) => {
     response.json(people)
 })
 const PORT = process.env.PORT||3001
