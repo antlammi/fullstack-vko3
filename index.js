@@ -4,8 +4,9 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 var morgan = require('morgan')
 
-
-require('dotenv').config()
+if (process.env.NODE_ENV !== 'production') {
+    require('dotenv').config()
+}
 const Person = require('./models/person')
 morgan.token('data', (req, res) => { 
     return `{"name": "${req.body.name}", "number": "${req.body.number}"}`
@@ -55,18 +56,9 @@ app.get('/api/people/:id', (request, response, next) => {
       }).catch(error => next(error))
         
 })
-app.post('/api/people', (request, response) => {
+app.post('/api/people', (request, response, next) => {
     const body = request.body
-    if (body.name === undefined || body.number === undefined){
-        return response.status(400).json({
-            error: 'content missing'
-        })
-    } 
-    if (people.map(person => person.name).includes(body.name)){
-        return response.status(400).json({
-            error: 'name must be unique'
-        })
-    }
+  
 
     const person = new Person({
         name:body.name,
@@ -75,8 +67,8 @@ app.post('/api/people', (request, response) => {
     person.save().then(savedPerson=> {
         response.json(savedPerson.toJSON())
         
-    })
-    people = people.concat(person)
+    }).catch(error => next(error))
+    
 })
 app.delete('/api/people/:id', (request, response, next) => {
     Person.findByIdAndRemove(request.params.id)
@@ -115,6 +107,8 @@ const errorHandler = (error, request, response, next) => {
 
     if (error.name === 'CastError' && error.kind == 'ObjectId'){
         return response.status(400).send({error:'malformatted id'})
+    } else if (error.name === 'ValidationError'){
+        return response.status(400).json({error: error.message})
     }
     next(error)
 }
