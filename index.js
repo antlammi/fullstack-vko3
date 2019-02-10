@@ -1,8 +1,33 @@
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
+var morgan = require('morgan')
+
 
 const PORT = 3001
+morgan.token('data', (req, res) => { 
+    return `{"name": "${req.body.name}", "number": "${req.body.number}"}`
+})
+app.use(morgan(function (tokens, req, res) {
+    if (tokens.method(req, res) === "POST"){
+        return [
+       
+            tokens.method(req, res),
+            tokens.url(req, res),
+            tokens.status(req, res),
+            tokens.res(req, res, 'content-length'), '-',
+            tokens['response-time'](req, res), 'ms',
+            tokens['data'](req,res)
+        ].join(' ')}
+    else {
+        return[
+            tokens.method(req, res),
+            tokens.url(req, res),
+            tokens.status(req, res),
+            tokens.res(req, res, 'content-length'), '-',
+            tokens['response-time'](req, res), 'ms'
+        ].join(' ')}
+  }))
 app.use(bodyParser.json())
 let people = [
     {
