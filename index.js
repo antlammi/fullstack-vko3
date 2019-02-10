@@ -4,11 +4,10 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 var morgan = require('morgan')
 
-
-
 morgan.token('data', (req, res) => { 
     return `{"name": "${req.body.name}", "number": "${req.body.number}"}`
 })
+
 app.use(morgan(function (tokens, req, res) {
     if (tokens.method(req, res) === "POST"){
         return [
@@ -19,16 +18,18 @@ app.use(morgan(function (tokens, req, res) {
             tokens.res(req, res, 'content-length'), '-',
             tokens['response-time'](req, res), 'ms',
             tokens['data'](req,res)
-        ].join(' ')}
-    else {
+        ].join(' ')
+    } else {
         return[
             tokens.method(req, res),
             tokens.url(req, res),
             tokens.status(req, res),
             tokens.res(req, res, 'content-length'), '-',
             tokens['response-time'](req, res), 'ms'
-        ].join(' ')}
+        ].join(' ')
+    }
   }))
+app.use(express.static('build'))
 app.use(cors())
 app.use(bodyParser.json())
 let people = [
